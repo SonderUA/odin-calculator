@@ -52,6 +52,14 @@ for (let key of keys) {
 	});
 }
 
+document.addEventListener("keydown", (event) => {
+	if (DIGITS.includes(event.key)) {
+		input.textContent += event.key;
+	} else if (event.key === "Escape") {
+		input.textContent = "";
+	}
+});
+
 for (let operator of operators) {
 	operator.addEventListener("click", (event) => {
 		if (calculator.a) {
