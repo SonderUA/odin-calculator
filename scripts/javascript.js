@@ -1,5 +1,5 @@
 let DIGITS = "0123456789";
-let OPERATORS = "+-*/";
+let OPERATORS = "+-*/=Enter";
 
 let calculator = {
 	PI: 3.1415,
@@ -25,7 +25,6 @@ function operate(string) {
 		alert("No input provided");
 		throw new Error("No input provided");
 	}
-	console.log(string);
 	let [firstNum, operator, secondNum] = string.split(" ");
 	switch (operator) {
 		case "+":
@@ -37,6 +36,28 @@ function operate(string) {
 		case "*":
 			return calculator.multiply(firstNum, secondNum);
 	}
+}
+
+function runOperator(event, keyboardInput = false) {
+	if (calculator.a) {
+		if (!calculator.b) {
+			calculator.b = input.textContent;
+			input.textContent = operate(
+				`${calculator.a} ${calculator.operator} ${calculator.b}`
+			);
+			calculator.a = 0;
+			calculator.b = 0;
+		}
+	} else {
+		calculator.a = input.textContent;
+		input.textContent = "";
+	}
+	if (keyboardInput ? event.key.toLowerCase() : event.target.id !== "enter")
+		calculator.operator = keyboardInput
+			? event.key === "Enter"
+				? "="
+				: event.key
+			: event.target.textContent;
 }
 
 let input = document.querySelector("#inputField");
@@ -57,25 +78,13 @@ document.addEventListener("keydown", (event) => {
 		input.textContent += event.key;
 	} else if (event.key === "Escape") {
 		input.textContent = "";
+	} else if (OPERATORS.includes(event.key)) {
+		runOperator(event, (keyboardInput = true));
 	}
 });
 
 for (let operator of operators) {
 	operator.addEventListener("click", (event) => {
-		if (calculator.a) {
-			if (!calculator.b) {
-				calculator.b = input.textContent;
-				input.textContent = operate(
-					`${calculator.a} ${calculator.operator} ${calculator.b}`
-				);
-				calculator.a = 0;
-				calculator.b = 0;
-			}
-		} else {
-			calculator.a = input.textContent;
-			input.textContent = "";
-		}
-		if (event.target.id !== "enter")
-			calculator.operator = event.target.textContent;
+		runOperator(event);
 	});
 }
