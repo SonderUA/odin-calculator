@@ -66,17 +66,22 @@ const operators = document.querySelectorAll(".operator");
 for (let key of keys) {
 	key.addEventListener("click", (event) => {
 		if (event.target.id === "clear") {
+			calculator.a = 0;
+			calculator.b = 0;
 			input.textContent = "";
 		} else if (DIGITS.includes(event.target.textContent)) {
 			input.textContent += event.target.textContent;
 		}
+		event.target.blur();
 	});
 }
 
 document.addEventListener("keydown", (event) => {
-	if (DIGITS.includes(event.key)) {
+	if (!event.repeat && DIGITS.includes(event.key)) {
 		input.textContent += event.key;
 	} else if (event.key === "Escape") {
+		calculator.a = 0;
+		calculator.b = 0;
 		input.textContent = "";
 	} else if (OPERATORS.includes(event.key)) {
 		runOperator(event, (keyboardInput = true));
