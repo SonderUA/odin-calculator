@@ -1,5 +1,6 @@
 let DIGITS = "0123456789";
 let OPERATORS = "+-*/=Enter";
+let LAST_DIGITS = 5;
 
 let calculator = {
 	PI: 3.1415,
@@ -42,9 +43,15 @@ function runOperator(event, keyboardInput = false) {
 	if (calculator.a) {
 		if (!calculator.b) {
 			calculator.b = input.textContent;
-			input.textContent = operate(
-				`${calculator.a} ${calculator.operator} ${calculator.b}`
-			);
+			input.textContent =
+				Math.round(
+					(operate(
+						`${calculator.a} ${calculator.operator} ${calculator.b}`
+					) +
+						Number.EPSILON) *
+						10 ** LAST_DIGITS
+				) /
+				10 ** LAST_DIGITS;
 			calculator.a = 0;
 			calculator.b = 0;
 		}
