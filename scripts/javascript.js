@@ -1,5 +1,11 @@
+let DIGITS = "0123456789";
+let OPERATORS = "+-*/";
+
 let calculator = {
 	PI: 3.1415,
+	a: 0,
+	operator: "",
+	b: 0,
 	add(a, b) {
 		return +a + +b;
 	},
@@ -19,6 +25,7 @@ function operate(string) {
 		alert("No input provided");
 		throw new Error("No input provided");
 	}
+	console.log(string);
 	let [firstNum, operator, secondNum] = string.split(" ");
 	switch (operator) {
 		case "+":
@@ -39,9 +46,7 @@ for (let key of keys) {
 	key.addEventListener("click", (event) => {
 		if (event.target.id === "clear") {
 			input.textContent = "";
-		} else if (event.target.id === "enter") {
-			console.log(operate(input.textContent));
-		} else {
+		} else if (DIGITS.includes(event.target.textContent)) {
 			input.textContent += event.target.textContent;
 		}
 	});
@@ -49,6 +54,20 @@ for (let key of keys) {
 
 for (let operator of operators) {
 	operator.addEventListener("click", (event) => {
-		input.textContent += ` ${event.target.textContent} `;
+		if (calculator.a) {
+			if (!calculator.b) {
+				calculator.b = input.textContent;
+				input.textContent = operate(
+					`${calculator.a} ${calculator.operator} ${calculator.b}`
+				);
+				calculator.a = 0;
+				calculator.b = 0;
+			}
+		} else {
+			calculator.a = input.textContent;
+			input.textContent = "";
+		}
+		if (event.target.id !== "enter")
+			calculator.operator = event.target.textContent;
 	});
 }
