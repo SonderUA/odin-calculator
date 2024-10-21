@@ -46,6 +46,12 @@ body {
 	background-color: rgb(55, 58, 64);
 }
 
+.reminder {
+	margin-left: auto;
+	font-size: 1.2rem;
+	margin-bottom: 2rem;
+}
+
 .key,
 .operator {
 	display: flex;
