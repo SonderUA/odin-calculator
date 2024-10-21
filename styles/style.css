@@ -56,9 +56,13 @@ body {
 	justify-content: center;
 }
 
-.row > .key:nth-last-child(1) > button {
+.row > .operator:nth-last-child(1) > button {
 	background-color: rgb(220, 150, 0);
 	border-color: rgb(220, 150, 0);
+}
+
+.operator > button {
+	background-color: rgb(104, 109, 118);
 }
 
 button {
