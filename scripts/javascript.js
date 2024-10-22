@@ -1,102 +1,121 @@
-let DIGITS = "0123456789";
-let OPERATORS = "+-*/=Enter";
-let LAST_DIGITS = 5;
+let DIGITS = "00123456789.π";
+let OPERATORS = "+-*/xy";
+let SOLO_OPERATORS = ["%", "√", "+/-", "x2"];
 
 let calculator = {
 	PI: 3.1415,
-	a: 0,
+	LAST_DIGITS: 14,
+	firstNumber: 0,
 	operator: "",
-	b: 0,
-	add(a, b) {
-		return +a + +b;
+	secondNumber: 0,
+	power: true,
+	round(number) {
+		return (
+			Math.round((number + Number.EPSILON) * 10 ** this.LAST_DIGITS) /
+			10 ** this.LAST_DIGITS
+		);
 	},
-	subtract(a, b) {
-		return +a - +b;
+	clear(element, empty = false) {
+		element.textContent = empty ? "" : "0";
 	},
-	multiply(a, b) {
-		return +a * +b;
+	clean() {
+		this.firstNumber = 0;
+		this.secondNumber = 0;
 	},
-	divide(a, b) {
-		return +a / +b;
+	operate(operator) {
+		switch (operator) {
+			case "+":
+				return this.add();
+			case "-":
+				return this.subtract();
+			case "/":
+				return this.secondNumber === "0" ? 0 : this.divide();
+			case "*":
+				return this.multiply();
+			case "xy":
+				return this.power();
+			case "√":
+				return Math.sqrt(+this.firstNumber);
+			case "%":
+				return +this.firstNumber / 100;
+			case "+/-":
+				return -this.firstNumber;
+			case "x2":
+				return +this.firstNumber * +this.firstNumber;
+			case "":
+				return this.firstNumber;
+		}
+	},
+	calculate(operator, display, element, solo = false) {
+		if (calculator.isNumber(display.textContent)) {
+			element.textContent = operator === "=" ? this.operator : operator;
+			if (this.firstNumber) {
+				if (!this.secondNumber && this.secondNumber !== "") {
+					this.secondNumber = display.textContent;
+					this.clear(display);
+					display.textContent = this.round(
+						this.operate(this.operator)
+					);
+					this.clean();
+				}
+			} else {
+				if (solo) {
+					this.firstNumber = display.textContent;
+					this.clear(display);
+					this.operator = operator;
+					display.textContent = this.round(
+						this.operate(this.operator)
+					);
+					this.clean();
+				} else {
+					this.firstNumber = display.textContent;
+					this.clear(display);
+				}
+			}
+			this.operator = operator === "=" ? this.operator : operator;
+		} else {
+			display.textContent === "Infinity"
+				? alert("Out of scope: the number is too big")
+				: alert("Invalid input: input value is string");
+			this.clean();
+			this.clear(display);
+		}
+	},
+	add() {
+		return +this.firstNumber + +this.secondNumber;
+	},
+	subtract() {
+		return +this.firstNumber - +this.secondNumber;
+	},
+	multiply() {
+		return +this.firstNumber * +this.secondNumber;
+	},
+	divide() {
+		return +this.firstNumber / +this.secondNumber;
+	},
+	power() {
+		return (+this.firstNumber) ** +this.secondNumber;
+	},
+	powerOff() {
+		calculator.power = false;
+		reminder.style.display = "none";
+		display.style.display = "none";
+		input.style.backgroundColor = "rgb(40, 40, 40)";
+	},
+	powerOn() {
+		calculator.power = true;
+		calculator.clear(display);
+		reminder.style.display = "block";
+		display.style.display = "inline";
+		input.style.backgroundColor = "rgb(55, 58, 64)";
+	},
+	isNumber(element) {
+		return typeof +element === "number" && isFinite(+element);
 	},
 };
 
-function operate(string) {
-	if (!string) {
-		alert("No input provided");
-		throw new Error("No input provided");
-	}
-	let [firstNum, operator, secondNum] = string.split(" ");
-	switch (operator) {
-		case "+":
-			return calculator.add(firstNum, secondNum);
-		case "-":
-			return calculator.subtract(firstNum, secondNum);
-		case "/":
-			return calculator.divide(firstNum, secondNum);
-		case "*":
-			return calculator.multiply(firstNum, secondNum);
-	}
-}
-
-function runOperator(event, keyboardInput = false) {
-	if (calculator.a) {
-		if (!calculator.b) {
-			calculator.b = input.textContent;
-			input.textContent =
-				Math.round(
-					(operate(
-						`${calculator.a} ${calculator.operator} ${calculator.b}`
-					) +
-						Number.EPSILON) *
-						10 ** LAST_DIGITS
-				) /
-				10 ** LAST_DIGITS;
-			calculator.a = 0;
-			calculator.b = 0;
-		}
-	} else {
-		calculator.a = input.textContent;
-		input.textContent = "";
-	}
-	if (keyboardInput ? event.key.toLowerCase() : event.target.id !== "enter")
-		calculator.operator = keyboardInput
-			? event.key === "Enter"
-				? "="
-				: event.key
-			: event.target.textContent;
-}
-
-let input = document.querySelector("#inputField");
-const keys = document.querySelectorAll(".key");
+let input = document.querySelector(".input");
+let display = document.querySelector(".content");
+let reminder = document.querySelector(".reminder");
+const digits = document.querySelectorAll(".key");
 const operators = document.querySelectorAll(".operator");
-for (let key of keys) {
-	key.addEventListener("click", (event) => {
-		if (event.target.id === "clear") {
-			calculator.a = 0;
-			calculator.b = 0;
-			input.textContent = "";
-		} else if (DIGITS.includes(event.target.textContent)) {
-			input.textContent += event.target.textContent;
-		}
-		event.target.blur();
-	});
-}
-
-document.addEventListener("keydown", (event) => {
-	if (!event.repeat && DIGITS.includes(event.key)) {
-		input.textContent += event.key;
-	} else if (event.key === "Escape") {
-		calculator.a = 0;
-		calculator.b = 0;
-		input.textContent = "";
-	} else if (OPERATORS.includes(event.key)) {
-		runOperator(event, (keyboardInput = true));
-	}
-});
-
-for (let operator of operators) {
-	operator.addEventListener("click", (event) => {
-		runOperator(event);
-	});
-}
